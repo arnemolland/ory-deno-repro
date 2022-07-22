@@ -3,17 +3,23 @@ import { ory } from "./ory.ts";
 
 const port = 3000;
 
-const handler = (request: Request): Response => {
-  return ory
-    .toSession(undefined, request.headers.get("cookie"))
-    .then(({ data: session }: { data: { identity?: unknown } }) => {
-      return Response.json(JSON.stringify(session.identity));
-    })
-    .catch((e: unknown) => {
-      console.error(e);
-      // If logged out, send to login page
-      return Response.redirect("http://localhost:4000/.ory/ui/login");
-    });
+const handler = async (request: Request): Promise<Response> => {
+  try {
+    const session = await ory
+      .toSession(undefined, request.headers.get("cookie") ?? undefined);
+
+    // Log session for debugging purposes
+    console.info(session);
+
+    // Return identity object
+    return Response.json(JSON.stringify(session?.identity));
+  } catch (e) {
+    // Log error for debugging purposes
+    console.error(e);
+
+    // Redirect to login
+    return Response.redirect("http://localhost:4000/.ory/ui/login");
+  }
 };
 
 console.log(`HTTP webserver running. Access it at: http://localhost:3000/`);

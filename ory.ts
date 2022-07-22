@@ -1,9 +1,11 @@
 import { sdk } from "./deps.ts";
 
-const ory: typeof sdk.V0alpha2Api = new sdk.V0alpha2Api(
-  new sdk.Configuration({
-    baseUrl: "/.ory",
-  }),
+const baseServer = new sdk.ServerConfiguration(
+  "http://localhost:4000/.ory",
+  {},
 );
+
+const configuration = sdk.createConfiguration({ baseServer });
+const ory = new sdk.V0alpha2Api(configuration);
 
 export { ory };
